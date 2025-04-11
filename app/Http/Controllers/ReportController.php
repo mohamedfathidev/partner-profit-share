@@ -72,14 +72,14 @@ class ReportController extends Controller
     public function generateMonthlyPdf(Request $request)
     {
         // Get the same data as in showGeneralMonthlyReport
-        $startOfMonth = Carbon::createFromDate($request->get('year'), $request->get('month'), '1')->startOfMonth();
-        $endOfMonth = Carbon::createFromDate($request->get('year'), $request->get('month'), '1')->endOfMonth()->endOfDay();
+        $startOfMonth = Carbon::createFromDate($request->get('year') ?? now()->year, $request->get('month') ?? now()->month , '1')->startOfMonth();
+        $endOfMonth = Carbon::createFromDate($request->get('year') ?? now()->year, $request->get('month') ?? now()->month, '1')->endOfMonth()->endOfDay();
 
         $partners = Partner::with(['transactions', 'profitShares'])
             ->whereHas('transactions', function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
             })
-            ->whereHas('profitShares', function ($query) use ($startOfMonth, $endOfMonth) {
+            ->orWhereHas('profitShares', function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
             })
             ->orWhere('active', 1)
@@ -124,7 +124,7 @@ class ReportController extends Controller
             'totalTransactions',
             'totalProfitShares',
             'startOfMonth',
-            'endOfMonth'
+            'endOfMonth'    
         ))->render();
 
         // Write HTML to PDF

@@ -1,11 +1,13 @@
 <?php
 
-use App\Http\Controllers\ManagerController;
-use App\Http\Controllers\MonthProfitController;
-use App\Http\Controllers\ReportController;
+use Carbon\Carbon;
+use App\Models\Partner;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MonthProfitController;
 use App\Http\Controllers\TransactionController;
 
 Route::group(["middleware" => "auth", "prefix" => "dashboard"], function () {
@@ -57,4 +59,4 @@ Route::middleware('auth')->group(function () {
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

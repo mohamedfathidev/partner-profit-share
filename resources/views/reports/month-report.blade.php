@@ -245,7 +245,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline-success">🔄 إعادة احتساب الأرباح</button>
-                <a href="{{ route('month-report-print') }}" class="btn btn-outline-secondary">طباعة 🖨️</a>
+                <a href="{{ route('generate-general-month-report', ['year' => request('year'), 'month' => request('month')]) }}" class="btn btn-outline-secondary">طباعة 🖨️</a>
                 <button class="btn btn-outline-dark">📁 تصدير CSV</button>
             </div>
         </div>

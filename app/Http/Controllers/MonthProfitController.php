@@ -94,17 +94,13 @@ class MonthProfitController extends Controller
 
         $netProfit = $request->input('total_profit') - $request->input('unused_goods');
 
-        $remainingMoney = $profitDistribution->calculateManagersProfit($netProfit, $monthProfit->id);
-
-        $monthProfit->update(['distribution_profit' => $remainingMoney]);
-
-        $profitDistribution->calculatePartnersProfit($remainingMoney, $monthProfit->id, $month, $year);
+        // Distribute the monthly profit
+        $profitDistribution->distributeMonthlyProfit($netProfit, $monthProfit->id, $month, $year);
 
         return redirect()->route('month-profits.index')
             ->with('success', 'تم توزيع بنجاح الرجاء التأكد!');
 
     }
-
 
     /**
      * Display the specified resource.
