@@ -2,75 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Partner;
-use Barryvdh\DomPDF\Facade\Pdf;
+
+use PDF;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Models\Partner;
 use Illuminate\View\View;
-use Mpdf\Mpdf;
-use Mpdf\MpdfException;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    public function showGeneralMonthlyReport(Request $request): View
+    public function showGeneralMonthlyForm(): View
     {
-        $startOfMonth = Carbon::createFromDate($request->get('year'), $request->get('month'), '1')->startOfMonth();
-        $endOfMonth = Carbon::createFromDate($request->get('year'), $request->get('month'), '1')->endOfMonth()->endOfDay();
-
-        $partners = Partner::with(['transactions', 'profitShares'])
-            ->whereHas('transactions', function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
-            })
-            ->whereHas('profitShares', function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
-            })
-            ->orWhere('active', 1)
-            ->get();
-
-        // Statics
-        $totalBalance = $partners->sum('balance');
-
-        // Total withdrawals (sum of all withdrawals across all partners)
-        $totalWithdrawals = $partners->sum(function ($partner) {
-            return $partner->transactions->where('type', 'withdrawal')->sum('amount');
-        });
-
-        // Total deposits (sum of all deposits across all partners)
-        $totalDeposits = $partners->sum(function ($partner) {
-            return $partner->transactions->where('type', 'deposite')->sum('amount');
-        });
-
-        // Total transactions count (sum of all transactions)
-        $totalTransactions = $partners->sum(function ($partner) {
-            return $partner->transactions->count();
-        });
-
-        $totalProfitShares = $partners->sum(function ($partner) {
-            return $partner->profitShares->sum('profit_share');
-        });
-
-        return view('reports.month-report', compact('partners', 'totalBalance', 'totalWithdrawals', 'totalDeposits', 'totalTransactions', 'totalProfitShares'));
+        return view('reports.general-monthly-report');
     }
 
-    public function showGeneralAnnualReport(): View
-    {
-        return view('reports.annual-report');
-    }
-
-    public function generateGeneralMonthlyReport(Request $request): View
-    {
-
-    }
-
-    /**
-     * @throws MpdfException
-     */
-    /**
-     * @throws MpdfException
-     */
-    public function generateMonthlyPdf(Request $request)
-    {
+    public function generateGeneralMonthlyReport(Request $request)
+    { 
         // Get the same data as in showGeneralMonthlyReport
         $startOfMonth = Carbon::createFromDate($request->get('year') ?? now()->year, $request->get('month') ?? now()->month , '1')->startOfMonth();
         $endOfMonth = Carbon::createFromDate($request->get('year') ?? now()->year, $request->get('month') ?? now()->month, '1')->endOfMonth()->endOfDay();
@@ -84,7 +31,7 @@ class ReportController extends Controller
             })
             ->orWhere('active', 1)
             ->get();
-
+ 
         // Calculate totals
         $totalBalance = $partners->sum('balance');
         $totalWithdrawals = $partners->sum(function ($partner) {
@@ -100,84 +47,36 @@ class ReportController extends Controller
             return $partner->profitShares->sum('profit_share');
         });
 
-        // Initialize mPDF with RTL support
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'default_font' => 'dejavusans', // Supports Arabic
-            'direction' => 'rtl', // Right-to-left for Arabic
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 20,
-            'margin_bottom' => 20,
-            'margin_header' => 10,
-            'margin_footer' => 10,
-            'tempDir' => storage_path('temp')
-        ]);
 
-        // Render the view with data
-        $html = view('reports.month-report', compact(
+        $pdf = PDF::loadView('pdf.general-monthly-report', compact(
             'partners',
             'totalBalance',
             'totalWithdrawals',
             'totalDeposits',
             'totalTransactions',
             'totalProfitShares',
-            'startOfMonth',
-            'endOfMonth'    
-        ))->render();
+            'startOfMonth'
+        ));
 
-        // Write HTML to PDF
-        $mpdf->WriteHTML($html);
+        // إضافة Watermark
+        $pdf->getMpdf()->SetWatermarkText('AL-MANSOUR');
+        $pdf->getMpdf()->showWatermarkText = true;
+        $pdf->getMpdf()->watermarkTextAlpha = 0.1; // شفافية العلامة المائية
 
-        // Output the PDF
-        return $mpdf->Output('monthly_report.pdf', 'I');
-    }
+        $pdf->getMpdf()->SetHTMLHeader('
+            <div style="text-align: center; font-family: Cairo; font-size: 12px; color: #666;">
+                تقرير توزيع الأرباح الشهري - AL-MANSOUR
+            </div>
+        ');
 
-    public function generatePDF()
-    {
-        // تهيئة mPDF مع دعم اللغة العربية
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'default_font' => 'tajawal', // استخدمنا خط Tajawal للعربية
-            'orientation' => 'P',
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 20,
-            'margin_bottom' => 20,
-            'margin_header' => 10,
-            'margin_footer' => 10,
-            'tempDir' => storage_path('temp')
-        ]);
+        // إضافة الفوتر مع رقم الصفحة
+        $pdf->getMpdf()->SetHTMLFooter('
+            <div style="text-align: center; font-family: Cairo; font-size: 10px; color: #666;">
+                صفحة  {PAGENO} 
+            </div>
+        ');
 
-        // إضافة CSS إضافي
-//        $stylesheet = file_get_contents(public_path('css/pdf-styles.css'));
-//        $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
-
-        // جلب محتوى صفحة Blade مع البيانات
-        $html = view('pdf', [
-            'partners' => [
-                ['name' => 'أحمد محمد', 'share' => '40%', 'sales' => 'SAR 25,000.00', 'profit' => 'SAR 10,000.00', 'amount' => 'SAR 4,000.00'],
-                ['name' => 'خالد عبدالله', 'share' => '35%', 'sales' => 'SAR 25,000.00', 'profit' => 'SAR 10,000.00', 'amount' => 'SAR 3,500.00'],
-                ['name' => 'سارة علي', 'share' => '25%', 'sales' => 'SAR 25,000.00', 'profit' => 'SAR 10,000.00', 'amount' => 'SAR 2,500.00'],
-            ],
-            'total_sales' => 'SAR 25,000.00',
-            'total_expenses' => 'SAR 15,000.00',
-            'net_profit' => 'SAR 10,000.00',
-            'total_partners_profit' => 'SAR 10,000.00'
-        ])->render();
-
-        // كتابة HTML في ملف PDF
-        $mpdf->WriteHTML($html);
-
-        // تحميل الملف PDF للمستخدم
-        return $mpdf->Output('تقرير_أرباح_الشركاء.pdf', 'D');
-    }
-
-
-    public function generateAnnualReport()
-    {
+        return $pdf->stream('doc.pdf');
 
     }
 }

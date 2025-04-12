@@ -172,16 +172,20 @@
 @section('content')
 
 
-    <form action="{{ route('show-month-general-report') }}" method="Get" class="row mb-4">
+    <form action="{{ route('report.general.month.generate') }}" method="Post" class="row mb-4">
+        @csrf
         <div class="col-md-4">
-            <label class="filter-label">السنة</label>
-            <input type="number" name="year" id="year">
+            <label class="filter-label">الشهر </label>
+            <select class="form-control" name="year">
+                @for ($i = 2025; $i <= now()->year ;$i++) 
+                <option value="{{ $i }}">{{ $i }}</option> 
+                @endfor
+            </select>
         </div>
         <div class="col-md-4">
             <label class="filter-label">الشهر </label>
             <select class="form-control" name="month">
-                <option value="{{ now()->month }}">-- الشهر الحالي --</option>
-                <option value="1">يناير</option>
+                <option value="{{ now()->month }}">-- الشهر الحالي --</option>                <option value="1">يناير</option>
                 <option value="2">فبراير</option>
                 <option value="3">مارس</option>
                 <option value="4">أبريل</option>
@@ -197,7 +201,7 @@
         </div>
         <div class="col-md-4">
             <label class="filter-label">&nbsp;</label>
-            <button type="submit" class="btn btn-primary btn-block">عرض التقرير</button>
+            <button type="submit" class="btn btn-primary btn-block">تحميل التقرير</button>
         </div>
     </form>
 
@@ -209,7 +213,7 @@
                     {{ \Carbon\Carbon::parse(now())->locale('ar')->translatedFormat('F Y') }} </div>
                 <div>إعداد النظام: {{ date('Y-m-d') }}</div>
             </div>
-            
+
             <div class="footer">
                 <p>التوقيع: مدير المشروع</p>
                 <p>بيانات التواصل: 0123XXXXXXX</p>
