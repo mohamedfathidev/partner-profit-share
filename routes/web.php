@@ -40,8 +40,8 @@ Route::group(["middleware" => "auth", "prefix" => "dashboard"], function () {
 
     // REPORTS
     // Month reports & Pdfs
-    Route::get('month/report', [ReportController::class, 'showGeneralMonthlyReport'])->name('show-month-general-report');
-    Route::get('month/pdf', [ReportController::class, 'generateMonthlyPdf'])->name('generate-general-month-report');
+    Route::get('report/month', [ReportController::class, 'showGeneralMonthlyForm'])->name('report.general.month');
+    Route::post('report/month/generate', [ReportController::class, 'generateGeneralMonthlyReport'])->name('report.general.month.generate');
 
     // Annual reports & Pdfs
     Route::get('annual/report', [ReportController::class, 'showGeneralAnnualReport'])->name('annual-report');

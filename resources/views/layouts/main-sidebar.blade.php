@@ -38,10 +38,10 @@
                         </a>
                         <ul class="side-nav-second-level" aria-expanded="false">
                             <li>
-                                <a href="{{ route('show-month-general-report') }}"><i class="ti-calendar"></i> التقرير الشهري العام</a>
+                                <a href="{{ route('report.general.month') }}"><i class="ti-calendar"></i> التقرير الشهري العام</a>
                             </li>
                             <li>
-                                <a href="{{ route('annual-report') }}"><i class="ti-target"></i> التقرير السنوي العام</a>
+                                <a href="#"><i class="ti-target"></i> التقرير السنوي العام</a>
                             </li>
                             <li>
                                 <a href="#"><i class="ti-pie-chart"></i>  التقرير الشهري المفصل</a>
