@@ -113,8 +113,8 @@
                     name: 'id'
                 },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'date',
+                        name: 'date'
                     },
                     {
                         data: 'total_profit',

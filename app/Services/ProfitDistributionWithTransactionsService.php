@@ -28,7 +28,7 @@ class ProfitDistributionWithTransactionsService
 
         $totalManagersProfit = 0;
 
-        if ($managers->isEmpty()) {  // علشان ميدخلش اللوب أصلا 
+        if ($managers->count() > 0) {  // علشان ميدخلش اللوب أصلا
             foreach ($managers as $manager) {
                 $managerMoney = ($manager->percentage / 100) * $netProfit;
                 $manager->profitShares()->create([
@@ -42,6 +42,7 @@ class ProfitDistributionWithTransactionsService
         }
 
         return $netProfit - $totalManagersProfit;
+
     }
 
 
@@ -73,7 +74,7 @@ class ProfitDistributionWithTransactionsService
         $eligibleBalances = [];
 
         foreach ($partners as $partner) {
-            
+
             $deposits = $partner->transactions()
                 ->where('type', 'deposite')
                 ->where('date', '<', $startOfMonth)

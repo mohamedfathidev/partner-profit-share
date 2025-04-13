@@ -38,6 +38,9 @@ class ManagerController extends Controller
                     return "<span class='badge badge-danger'>غير نشط</span>";
                 }
             })
+            ->editColumn('name', function ($row) {
+                return "<a href='/dashboard/managers/$row->id' class='text-primary'>$row->name</a>";
+            })
             ->addColumn('actions', function ($row) {
                 $buttons = "";
 
@@ -46,7 +49,7 @@ class ManagerController extends Controller
 
                 return $buttons;
             })
-            ->rawColumns(['actions', 'active'])
+            ->rawColumns(['actions', 'active', 'name'])
             ->make(true);
 
     }
@@ -86,9 +89,11 @@ class ManagerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Manager $manager)
+    public function show(Manager $manager): View
     {
-        //
+        $manager->load('profitShares');
+
+        return view('managers.show', compact('manager'));
     }
 
     /**
