@@ -31,8 +31,9 @@
             <div class="col-md-12 mb-30">
                 <div class="card card-statistics h-100">
                     <div class="card-body">
-                        <form action="{{ route('month-profits.update', $details->id) }}" method="POST">
+                        <form action="{{ route('month-profits.update', $details->id) }}" method="post">
                             @csrf
+                            @method('PUT')
                             <div class="form-group col-6">
                                 <label for="exampleFormControlInput1">إجمالي الأرباح الشهرية</label>
                                 <input type="text" name="total_profit" class="form-control" id="exampleFormControlInput1"
@@ -52,7 +53,7 @@
                             <div class="form-group col-6">
                                 <label for="exampleFormControlInput1">التاريخ</label>
                                 <input type="text" name="date" class="form-control" id="date"
-                                       value="{{ \Carbon\Carbon::parse($details->created_at)->format('Y-m-d')  }}" autocomplete="off">
+                                       value="{{ \Carbon\Carbon::createFromDate($details->year, $details->month, 27)->format('Y-m-d')  }}" autocomplete="off">
                                 @error('date')
                                 <p class="alert alert-danger">{{ $message }}</p>
                                 @enderror
