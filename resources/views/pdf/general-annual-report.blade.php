@@ -126,8 +126,9 @@
         <div class="col-md-12">
             <div class="header">
                 <h3 style="font-weight: bold; font-size: 28px; color: #333;">AL-MANSOUR</h3>
-                <div class="title">تقرير توزيع الأرباح الشهري عن شهر
-                    {{ $startOfMonth->locale('ar')->translatedFormat('F') }}</div>
+                <div class="title">تقرير توزيع الأرباح السنوي من الفترة {{ $fromDate->locale('ar')->translatedFormat('d F Y') }} إلي {{ $toDate->locale('ar')->translatedFormat('d F Y') }}
+
+                </div>
             </div>
 
             <div class="info">

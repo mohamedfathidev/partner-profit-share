@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'تقارير الأرباح')
+@section('title', ' التقرير الشهر عن الأرباح')
 
 @section('css')
     <meta charset="UTF-8">
@@ -177,8 +177,8 @@
         <div class="col-md-4">
             <label class="filter-label">الشهر </label>
             <select class="form-control" name="year">
-                @for ($i = 2025; $i <= now()->year ;$i++) 
-                <option value="{{ $i }}">{{ $i }}</option> 
+                @for ($i = 2025; $i <= now()->year ;$i++)
+                <option value="{{ $i }}">{{ $i }}</option>
                 @endfor
             </select>
         </div>
@@ -205,21 +205,7 @@
         </div>
     </form>
 
-    <div class="row pdf-report">
-        <div class="col-md-12">
-            <div class="header">
-                <h3 style="font-weight: bold">AL-MANSOUR</h3>
-                <div class="title">تقرير الأرباح الشهري -
-                    {{ \Carbon\Carbon::parse(now())->locale('ar')->translatedFormat('F Y') }} </div>
-                <div>إعداد النظام: {{ date('Y-m-d') }}</div>
-            </div>
 
-            <div class="footer">
-                <p>التوقيع: مدير المشروع</p>
-                <p>بيانات التواصل: 0123XXXXXXX</p>
-            </div>
-        </div>
-    </div>
 
 @endsection
 
