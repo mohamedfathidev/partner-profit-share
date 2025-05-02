@@ -15,86 +15,86 @@
 </head>
 
 <body>
-    <div class="wrapper">
+<div class="wrapper">
 
-        <!--=================================
- preloader -->
+    <!--=================================
+preloader -->
 
-        <div id="pre-loader">
-            <img src="assets/images/pre-loader/loader-01.svg" alt="">
-        </div>
-
-        <!--=================================
- preloader -->
-
-        @include('layouts.main-header')
-
-        @include('layouts.main-sidebar')
-
-        <!--=================================
- Main content -->
-        <!-- main-content -->
-        <div class="content-wrapper">
-
-            @yield('page-header')
-
-            @yield('content')
-
-            <!--=================================
- wrapper -->
-
-            <!--=================================
- footer -->
-
-            @include('layouts.footer')
-        </div><!-- main content wrapper end-->
-    </div>
-    </div>
+    <div id="pre-loader">
+        <img src="assets/images/pre-loader/loader-01.svg" alt="">
     </div>
 
     <!--=================================
- footer -->
+preloader -->
 
-    @include('layouts.footer-scripts')
+    @include('layouts.main-header')
 
-    @stack('scripts')
+    @include('layouts.main-sidebar')
 
-    @stack('js-code')
+    <!--=================================
+ Main content -->
+    <!-- main-content -->
+    <div class="content-wrapper">
 
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
+        @yield('page-header')
 
-    <script>
-        $(document).ready(function() {
-            @if (session('success'))
-                toastr.success(
-                "{{ session('success') }}"); // there is a probelm navigate back show the message again and return
-                @php
-                    session()->forget('success');
-                @endphp
-            @endif
+        @yield('content')
 
-            @if (session('error'))
-                toastr.error("{{ session('error') }}");
-                @php
-                    session()->forget('error');
-                @endphp
-            @endif
+        <!--=================================
+ wrapper -->
 
-            @if (session('warning'))
-                toastr.warning("{{ session('warning') }}");
-                @php
-                    session()->forget('warning');
-                @endphp
-            @endif
+        <!--=================================
+footer -->
 
-            @if (session('info'))
-                toastr.info("{{ session('info') }}");
-                @php
-                    session()->forget('info');
-                @endphp
-            @endif
-        });
-    </script>
+        @include('layouts.footer')
+    </div><!-- main content wrapper end-->
+</div>
+</div>
+</div>
+
+<!--=================================
+footer -->
+
+@include('layouts.footer-scripts')
+
+@stack('scripts')
+
+@stack('js-code')
+
+@vite(['resources/js/app.js', 'resources/css/app.css'])
+
+<script>
+    $(document).ready(function() {
+        @if (session('success'))
+        toastr.success(
+            "{{ session('success') }}"); // there is a probelm navigate back show the message again and return
+        @php
+            session()->forget('success');
+        @endphp
+        @endif
+
+        @if (session('error'))
+        toastr.error("{{ session('error') }}");
+        @php
+            session()->forget('error');
+        @endphp
+        @endif
+
+        @if (session('warning'))
+        toastr.warning("{{ session('warning') }}");
+        @php
+            session()->forget('warning');
+        @endphp
+        @endif
+
+        @if (session('info'))
+        toastr.info("{{ session('info') }}");
+        @php
+            session()->forget('info');
+        @endphp
+        @endif
+    });
+</script>
 </body>
 
 </html>

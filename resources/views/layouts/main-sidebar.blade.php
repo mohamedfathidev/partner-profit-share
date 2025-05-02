@@ -52,18 +52,18 @@
                         </ul>
                     </li>
 
-{{--                            <li>--}}
-{{--                                <a href="javascript:void(0);" data-toggle="collapse" data-target="#error">level--}}
-{{--                                    item 2<div class="pull-right"><i class="ti-plus"></i></div>--}}
-{{--                                    <div class="clearfix"></div>--}}
-{{--                                </a>--}}
-{{--                                <ul id="error" class="collapse">--}}
-{{--                                    <li> <a href="#">level item 2.1</a> </li>--}}
-{{--                                    <li> <a href="#">level item 2.2</a> </li>--}}
-{{--                                </ul>--}}
-{{--                            </li>--}}
-{{--                        </ul>--}}
-{{--                    </li>--}}
+                    {{--                            <li>--}}
+                    {{--                                <a href="javascript:void(0);" data-toggle="collapse" data-target="#error">level--}}
+                    {{--                                    item 2<div class="pull-right"><i class="ti-plus"></i></div>--}}
+                    {{--                                    <div class="clearfix"></div>--}}
+                    {{--                                </a>--}}
+                    {{--                                <ul id="error" class="collapse">--}}
+                    {{--                                    <li> <a href="#">level item 2.1</a> </li>--}}
+                    {{--                                    <li> <a href="#">level item 2.2</a> </li>--}}
+                    {{--                                </ul>--}}
+                    {{--                            </li>--}}
+                    {{--                        </ul>--}}
+                    {{--                    </li>--}}
                 </ul>
             </div>
         </div>
