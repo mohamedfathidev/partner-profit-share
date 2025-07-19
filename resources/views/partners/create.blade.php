@@ -42,7 +42,7 @@
                         </div>
                         <div class="form-group">
                           <label for="exampleFormControlInput1">المبلغ</label>
-                          <input type="number" name="balance" class="form-control" id="exampleFormControlInput1" value="{{ old('balance') }}">
+                          <input type="number" name="initial_balance" class="form-control" id="exampleFormControlInput1" value="{{ old('balance') }}">
                           @error('balance')
                             <p class="alert alert-danger">{{ $message }}</p>
                           @enderror

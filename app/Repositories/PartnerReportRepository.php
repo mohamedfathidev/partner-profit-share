@@ -9,15 +9,30 @@ class PartnerReportRepository
 {
     public function getPartnersTransactionsAndProfits($startDate, $endDate): Collection
     {
-        return Partner::with(['transactions', 'profitShares'])
-            ->whereHas('transactions', function ($query) use ($startDate, $endDate) {
+        return Partner::with([
+            'transactions' => function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('date', [$startDate, $endDate]);
-            })
-            ->orWhereHas('profitShares', function ($query) use ($startDate, $endDate) {
+            },
+            'profitShares' => function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('date', [$startDate, $endDate]);
-            })
-            ->orWhere('active', 1)
-            ->get();
+            }
+        ])
+        ->orWhere('active', 1)
+        ->get();
+    }
+
+    public function getPartnerTransactionsAndProfits($partnerId, $startDate, $endDate): Partner
+    {
+        return Partner::with([
+            'transactions' => function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate]);
+            }, 
+            'profitShares' => function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate]);
+            }
+        ])
+        ->where('id', $partnerId)
+        ->first();
     }
 
 }

@@ -23,8 +23,7 @@ class StorePartnerRquest extends FormRequest
     {
         return [
             "name" => "required|string",
-            "balance" => "required|numeric",
-            "type" => "in:0,1"
+            "initial_balance" => "required|numeric|min:0",
         ];
     }
 
@@ -33,8 +32,9 @@ class StorePartnerRquest extends FormRequest
         return 
         [
             "name.required" => "هذا الحقل مطلوب",
-            "balance.required" => "هذا الحثل مطلوب",
-            "balance.numeric" => "يجب أن يحتوى على أرقام فقط"
+            "initial_balance.required" => "هذا الحثل مطلوب",
+            "initial_balance.numeric" => "يجب أن يحتوى على أرقام فقط",
+            "initial_balance.min" => "يجب أن يكون المبلغ أكبر من 0",
         ];
     }
 }

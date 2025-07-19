@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Repositories\PartnerReportRepository;
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\Log;
+
+
 class ReportService
 {
     private PartnerReportRepository $partnerReportRepo;
@@ -18,40 +21,47 @@ class ReportService
 
     public function generateGeneralMonthlyReport($year, $month): void
     {
-        $startOfMonth = Carbon::createFromDate($year ?? now()->year, $month ?? now()->month , '1')->startOfMonth();
-        $endOfMonth = Carbon::createFromDate($year ?? now()->year, $month ?? now()->month, '1')->endOfMonth()->endOfDay();
+        try {
+            $startOfMonth = Carbon::createFromDate($year ?? now()->year, $month ?? now()->month , '1')->startOfMonth();
+            $endOfMonth = Carbon::createFromDate($year ?? now()->year, $month ?? now()->month, '1')->endOfMonth()->endOfDay();
 
-        // Partners
-        $partners = $this->partnerReportRepo->getPartnersTransactionsAndProfits($startOfMonth, $endOfMonth);
+            $partners = $this->partnerReportRepo->getPartnersTransactionsAndProfits($startOfMonth, $endOfMonth);
+            $totalArray = $this->calculateTotals($partners);
 
-        // Calculate totals
-        $totalArray = $this->calculateTotals($partners);
+            $data = [];
+            $data['partners'] = $partners;
+            $data['totalArray'] = $totalArray;
+            $data['startOfMonth'] = $startOfMonth;
 
-        $data = [];
-        $data['partners'] = $partners;
-        $data['totalArray'] = $totalArray;
-        $data['startOfMonth'] = $startOfMonth;
+            $this->pdfService->generatePdf('pdf.general-monthly-report', $data);
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate monthly report: ' . $e->getMessage());
+            throw new \Exception('فشل إنشاء التقرير. يرجى المحاولة لاحقًا.');
+        }
 
-        // Generate pdf
-        $this->pdfService->generatePdf('pdf.general-monthly-report', $data);
     }
 
     public function generateGeneralAnnualReport($fromDate, $toDate): void
     {
-        $fromDate = Carbon::parse($fromDate);
-        $toDate = Carbon::parse($toDate);
+        try {
+            $fromDate = Carbon::parse($fromDate);
+            $toDate = Carbon::parse($toDate);
 
-        $partners = $this->partnerReportRepo->getPartnersTransactionsAndProfits($fromDate, $toDate);
-        // Calculate totals
-        $totalArray = $this->calculateTotals($partners);
+            $partners = $this->partnerReportRepo->getPartnersTransactionsAndProfits($fromDate, $toDate);
+            $totalArray = $this->calculateTotals($partners);
 
-        $data = [];
-        $data['partners'] = $partners;
-        $data['totalArray'] = $totalArray;
-        $data['fromDate'] = $fromDate;
-        $data['toDate'] = $toDate;
+            $data = [];
+            $data['partners'] = $partners;
+            $data['totalArray'] = $totalArray;
+            $data['fromDate'] = $fromDate;
+            $data['toDate'] = $toDate;
 
-        $this->pdfService->generatePdf('pdf.general-annual-report', $data);
+            $this->pdfService->generatePdf('pdf.general-annual-report', $data);
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate annual report: ' . $e->getMessage());
+            throw new \Exception('فشل إنشاء التقرير. يرجى المحاولة لاحقًا.');
+        }
+
     }
 
     public function calculateTotals($partners): array
@@ -80,4 +90,51 @@ class ReportService
         ];
     }
 
+    public function generatePartnerMonthlyReport($partnerId, $year, $month)
+    {
+        try {
+            $startOfMonth = Carbon::createFromDate($year, $month, '1')->startOfMonth();
+            $endOfMonth = Carbon::createFromDate($year, $month, '1')->endOfDay()->endOfMonth();
+
+            $partner = $this->partnerReportRepo->getPartnerTransactionsAndProfits($partnerId, $startOfMonth, $endOfMonth);
+
+            $data = [];
+
+            $data['partner'] = $partner;
+            $data['startOfMonth'] = $startOfMonth;
+            $data['endOfMonth'] = $endOfMonth;
+
+            $this->pdfService->generatePartnerPdf('pdf.partner-monthly-report', $data);
+
+        } catch(\Exception $e) {
+            \Log::error('Failed to generate partner monthly report'.$e->getMessage());
+            throw new \Exception('فشل إنشاء التقرير. يرجى المحاولة لاحقًا.'. $e->getMessage());
+        }
+        
+    }
+
+    public function generatePartnerAnnualReport($partnerId, $fromDate, $toDate) 
+    {
+        try {
+            $fromDate = Carbon::parse($fromDate);
+            $toDate = Carbon::parse($toDate);
+
+
+            $partner = $this->partnerReportRepo->getPartnerTransactionsAndProfits($partnerId, $fromDate, $toDate);
+
+            $data = [];
+
+            $data['partner'] = $partner;
+            $data['fromDate'] = $fromDate;
+            $data['toDate'] = $toDate;
+
+            $this->pdfService->generatePartnerPdf('pdf.partner-annual-report', $data);
+
+        } catch(\Exception $e) {
+            \Log::error('Failed to generate partner monthly report'.$e->getMessage());
+            throw new \Exception('فشل إنشاء التقرير. يرجى المحاولة لاحقًا.'. $e->getMessage());
+        }
+    }
+
 }
+

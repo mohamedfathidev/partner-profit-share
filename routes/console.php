@@ -13,3 +13,5 @@ Artisan::command('inspire', function () {
 
 Schedule::job(new UpdateStatusJob())->everyMinute();
 
+
+Schedule::command('database:backup')->daily();

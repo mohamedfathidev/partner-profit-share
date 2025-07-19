@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('key')->unique();
-            $table->string('value');
-            $table->timestamps();
+        Schema::table('month_profits', function (Blueprint $table) {
+            $table->string("note")->after("version")->nullable();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('settings');
+        Schema::table('month_profits', function (Blueprint $table) {
+            $table->dropColumn("note");
+        });
     }
 };

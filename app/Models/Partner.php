@@ -28,10 +28,50 @@ class Partner extends Model
     // note : to retrieve the sum of balance from accessor that work on a single partner use this => Partner::all()->sum('balance');
     public function getBalanceAttribute(): float
     {
-        $deposits = $this->transactions()->where('type', 'deposite')->sum('amount');
+        $deposits = $this->transactions()->where('type', 'deposite')->sum('amount') ?? 0;
+        $withdrawals = $this->transactions()->where('type', 'withdrawal')->sum('amount') ?? 0;
+        $initial = $this->initial_balance ?? 0;
 
-        $withdrawals = $this->transactions()->where('type', 'withdrawal')->sum('amount');
+        return max(0, $initial + $deposits - $withdrawals); // although i checked if current balance > withdrawal but still for more roboust code 
+    }
 
-        return $this->initial_balance + $deposits - $withdrawals;
+    public function currentBalanceUntilMonth($endOfMonth): float
+    {
+        $initial = $this->initial_balance;
+
+        $deposits = $this->transactions()
+            ->where('type', 'deposite')
+            ->whereDate('date', '<=', $endOfMonth)
+            ->sum('amount');
+
+        
+
+        $withdrawals = $this->transactions()
+            ->where('type', 'withdrawal')
+            ->whereDate('date', '<=', $endOfMonth)
+            ->sum('amount');
+
+        
+        return max(0, $initial + $deposits - $withdrawals);
+    }
+
+    public function currentBalancefromDateToDate($fromDate, $toDate)
+    {
+        $initial = $this->initial_balance;
+
+        $deposits = $this->transactions()
+            ->where('type', 'deposite')
+            ->whereBetween('date', [$fromDate, $toDate])
+            ->sum('amount');
+
+            $withdrawals = $this->transactions()
+            ->where('type', 'withdrawal')
+            ->whereBetween('date', [$fromDate, $toDate])
+            ->sum('amount');
+
+        
+        return max(0, $initial + $deposits - $withdrawals);
+
+
     }
 }

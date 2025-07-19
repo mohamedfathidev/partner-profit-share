@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,7 +14,26 @@ class SettingController extends Controller
      */
     public function index(): View
     {
-        return view('settings.index');
+        $settings = Setting::all();
+        return view('settings.index', compact('settings'));
+    }
+
+    public function load()
+    {
+        $records = Setting::select('id', 'key', 'value');
+
+        return datatables()
+        ->of($records)
+        ->addColumn('actions', function ($row) {
+
+            $buttons = "";
+
+            $buttons .="<a href='/dashboard/partners/$row->id/edit' class='btn btn-sm btn-warning' style='margin-left:5px;'>تعديل</a>";
+
+            return $buttons;
+        })
+        ->rawColumns(['actions'])
+        ->make(true);
     }
 
     /**
@@ -42,17 +63,27 @@ class SettingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Setting $setting)
     {
-        //
+
+        $details = $setting;
+        return view('settings.edit', compact('details'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Setting $setting): RedirectResponse
     {
-        //
+        $request->validate([
+            "value" => 'required',
+        ]);
+
+        $setting->update([
+            "value" => $request->value,
+        ]);
+
+        return redirect()->route('settings.index')->with('success', 'تم تحديث الإعداد بالنجاح');
     }
 
     /**

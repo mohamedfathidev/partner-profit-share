@@ -57,23 +57,7 @@ class PartnerController extends Controller
         ->rawColumns(['actions', 'name', 'active'])
         ->make(true);
     }
-
-    public function generatePdf(){
-        $data = [
-            'title' => 'تقرير شهري',
-            'date' => date('Y-m-d'),
-            'partners' => Partner::all(), // Fetch data from the database
-            'totalProfit' => ProfitShare::where('month_profit_id', 1)->sum('profit_share'),
-            'activePartners' => Partner::where('active', 1)->count(),
-        ];
-
-        $pdf = Pdf::loadView('month_report', $data,[
-            'format' => 'A4-P',
-            'orientation' => 'P'
-        ]);
-
-        return $pdf->stream('user_report.pdf');
-    }
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -89,7 +73,7 @@ class PartnerController extends Controller
     {
         Partner::create([
             "name" => $request->name,
-            "initial_balance" => $request->balance,
+            "initial_balance" => $request->initial_balance,
             "address" => $request->address,
             "phone" => $request->phone,
             "active" => $request->active ?? 0,
@@ -105,7 +89,7 @@ class PartnerController extends Controller
     {
         $partnerTransactions = $partner->load(['transactions']);
 
-        $partnerProfits = $partner->load('ProfitShares');
+        $partnerProfits = $partner->load('profitShares');
 
         return view('partners.show', compact('partner', 'partnerTransactions', 'partnerProfits'));
     }
@@ -128,7 +112,7 @@ class PartnerController extends Controller
         $partnerNew = $partner->update([
             "name" => $request->name,
             "phone" => $request->phone,
-            "initial_balance" => $request->balance,
+            "initial_balance" => $request->initial_balance,
             "address" => $request->address,
             "active" => $request->active ?? 0,
         ]);
@@ -143,6 +127,8 @@ class PartnerController extends Controller
      */
     public function destroy(Partner $partner)
     {
+        $partner->profitShares()->delete();
+        $partner->transactions()->delete();
         $partner->delete();
 
         return response()->json(['message' => 'تم حذف الشريك بنجاح'], 200);
