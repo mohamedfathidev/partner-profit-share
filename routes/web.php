@@ -96,6 +96,7 @@ Route::group(["middleware" => "auth", "prefix" => "dashboard"], function () {
 
     Route::get('/migrate', [MigrateToNewYearController::class, 'showMigration'])->name('show.migration');
     Route::post('/migrate', [MigrateToNewYearController::class, 'migrate'])->name('migrate');
+
 });
 
 Route::middleware('auth')->group(function () {

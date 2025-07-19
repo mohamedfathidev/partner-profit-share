@@ -125,7 +125,9 @@
     <div class="pdf-report">
         <div class="col-md-12">
             <div class="header">
+
                 <h3 style="font-weight: bold; font-size: 28px; color: #333;">ABN-MANSOUR</h3>
+
                 <div class="title">تقرير توزيع الأرباح السنوي من الفترة {{ $fromDate->locale('ar')->translatedFormat('d F Y') }} إلي {{ $toDate->locale('ar')->translatedFormat('d F Y') }}
 
                 </div>
@@ -204,3 +206,4 @@
 
 
 </html>
+

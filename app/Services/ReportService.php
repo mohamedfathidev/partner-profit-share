@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Repositories\PartnerReportRepository;
 use Carbon\Carbon;
+
 use Illuminate\Support\Facades\Log;
+
 
 class ReportService
 {
@@ -36,6 +38,7 @@ class ReportService
             \Log::error('Failed to generate monthly report: ' . $e->getMessage());
             throw new \Exception('فشل إنشاء التقرير. يرجى المحاولة لاحقًا.');
         }
+
     }
 
     public function generateGeneralAnnualReport($fromDate, $toDate): void
@@ -58,10 +61,12 @@ class ReportService
             \Log::error('Failed to generate annual report: ' . $e->getMessage());
             throw new \Exception('فشل إنشاء التقرير. يرجى المحاولة لاحقًا.');
         }
+
     }
 
     public function calculateTotals($partners): array
     {
+
         $totalBalance = $partners->sum('balance');
         $totalWithdrawals = $partners->sum(function ($partner) {
             return $partner->transactions->where('type', 'withdrawal')->sum('amount');
@@ -84,7 +89,6 @@ class ReportService
             "totalProfitShares" => $totalProfitShares
         ];
     }
-
 
     public function generatePartnerMonthlyReport($partnerId, $year, $month)
     {
@@ -133,3 +137,4 @@ class ReportService
     }
 
 }
+

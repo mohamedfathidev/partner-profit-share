@@ -74,4 +74,5 @@ class PdfService
 
         return $pdf->stream($header . now()->format('Y-m-d') . '.pdf');
     }
+
 }
