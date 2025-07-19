@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('key')->unique();
-            $table->string('value');
-            $table->timestamps();
+        Schema::table('profit_shares', function (Blueprint $table) {
+            $table->string("note")->after("month_profit_id")->nullable();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('settings');
+        Schema::table('profit_shares', function (Blueprint $table) {
+            $table->dropColumn("note");
+        });
     }
 };

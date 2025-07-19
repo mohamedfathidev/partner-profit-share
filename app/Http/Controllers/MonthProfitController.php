@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NoEligiblePartnersException;
 use Carbon\Carbon;
 use App\Models\Manager;
 use App\Models\Partner;
@@ -87,7 +88,7 @@ class MonthProfitController extends Controller
 
         // Just insert Date between 25 -> end of month only, work with days only for entering  past months
         $redirect = $this->validateDateWithinAllowedRange($request->get('date'));
-        if ($redirect) return $redirect;
+        if ($redirect) return $redirect;  // if it is not between 25 -> end of month, will redirect to the previous page with an error message
          
 
         $monthProfit = MonthProfit::create([
@@ -99,8 +100,13 @@ class MonthProfitController extends Controller
 
         $netProfit = $request->input('total_profit') - $request->input('unused_goods');
 
-        // Distribute the monthly profit
-        $profitDistribution->distributeMonthlyProfit($netProfit, $monthProfit->id, $date['month'], $date['year']);
+        try {
+            // Distribute the monthly profit
+            $profitDistribution->distributeMonthlyProfit($netProfit, $monthProfit->id, $date['month'], $date['year'], $request->get('date'));
+        } catch (NoEligiblePartnersException $e) {
+            $monthProfit->delete();
+            return redirect()->route('month-profits.create')->with('error', $e->getMessage());
+        }
 
         return redirect()->route('month-profits.index')
             ->with('success', 'تم توزيع بنجاح الرجاء التأكد!');

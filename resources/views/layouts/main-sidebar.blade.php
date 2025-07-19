@@ -41,16 +41,33 @@
                                 <a href="{{ route('report.general.month') }}"><i class="ti-calendar"></i> التقرير الشهري العام</a>
                             </li>
                             <li>
-                                <a href="#"><i class="ti-target"></i> التقرير السنوي العام</a>
+                                <a href="{{ route('report.general.annual') }}"><i class="ti-target"></i> التقرير السنوي العام</a>
                             </li>
                             <li>
-                                <a href="#"><i class="ti-pie-chart"></i>  التقرير الشهري المفصل</a>
+                                <a href="{{ route('report.partner.monthly') }}"><i class="ti-pie-chart"></i>  التقرير الشهري المفصل</a>
                             </li>
                             <li>
-                                <a href="#"><i class="ti-stats-up"></i>  التقرير السنوي المفصل</a>
+                                <a href="{{ route('report.partner.annual') }}"><i class="ti-stats-up"></i>  التقرير السنوي المفصل</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('report.partners.history') }}"><i class="ti-stats-up"></i>سجل الشركاء</a>
                             </li>
                         </ul>
                     </li>
+                    
+                       
+                    <ul class="side-nav-second-level" aria-expanded="false">
+                            <li>
+                                <a href="{{ route('backup.to.drive') }}"><i class="ti-calendar"></i>نسخ لدرايف أونلاين</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('settings.index') }}"><i class="ti-calendar"></i>الإعدادات</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('show.migration') }}"><i class="ti-calendar"></i>ترحيل</a>
+                            </li>
+                    </ul>
+                    
 
 {{--                            <li>--}}
 {{--                                <a href="javascript:void(0);" data-toggle="collapse" data-target="#error">level--}}

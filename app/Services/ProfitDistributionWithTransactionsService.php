@@ -2,27 +2,29 @@
 
 namespace App\Services;
 
+use App\Exceptions\NoEligiblePartnersException;
 use Carbon\Carbon;
 use App\Models\Manager;
 use App\Models\Partner;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 
 class ProfitDistributionWithTransactionsService
 {
-    public function distributeMonthlyProfit(float $netProfit, int $monthProfitId, int $month, int $year): void
+    public function distributeMonthlyProfit(float $netProfit, int $monthProfitId, int $month, int $year, $date): bool
     {
-        // make the distribution as one transaction (all or not)
-        DB::transaction(function () use ($netProfit, $monthProfitId, $month, $year) {
-            $remainingProfit = $this->distributeManagersProfit($netProfit, $monthProfitId);
+        DB::transaction(function () use ($netProfit, $monthProfitId, $month, $year, $date) {
+            $remainingProfit = $this->distributeManagersProfit($netProfit, $monthProfitId, $date);
 
             if ($remainingProfit > 0) {
-                $this->distributePartnersProfit($remainingProfit, $monthProfitId, $month, $year);
+                $this->distributePartnersProfit($remainingProfit, $monthProfitId, $month, $year, $date);
             }
         });
+        return true;
     }
 
-    public function distributeManagersProfit(float $netProfit, int $monthProfitId): float|int
+    public function distributeManagersProfit(float $netProfit, int $monthProfitId, $date): float|int
     {
         $managers = Manager::where('active', 1)->get();
 
@@ -34,7 +36,7 @@ class ProfitDistributionWithTransactionsService
                 $manager->profitShares()->create([
                     "month_profit_id" => $monthProfitId,
                     "profit_share" => $managerMoney,
-                    "date" => Carbon::now()->toDateString(),
+                    "date" => $date,
                 ]);
 
                 $totalManagersProfit += $managerMoney;
@@ -42,26 +44,31 @@ class ProfitDistributionWithTransactionsService
         }
 
         return $netProfit - $totalManagersProfit;
-
     }
 
 
-    public function distributePartnersProfit($remainingMoney, $monthProfitId, $month, $year): void
+    public function distributePartnersProfit(float $remainingMoney, int $monthProfitId, int $month, int $year, $date): void
     {
-        $eligibleBalances = $this->getPartnersEligibleBalances($month, $year);
 
-        // calculate the total right balance using array_sum()
-        $totalBalance = array_sum($eligibleBalances);
+            $eligibleBalances = $this->getPartnersEligibleBalances($month, $year);
 
+            // calculate the total right balance using array_sum()
+            $totalBalance = array_sum($eligibleBalances);
 
-        foreach ($eligibleBalances as $partnerId => $profitableBalance) {
-            $partnerMoney = ($profitableBalance / $totalBalance)  * $remainingMoney;
-            Partner::find($partnerId)->profitShares()->create([
-                "month_profit_id" => $monthProfitId,
-                "profit_share" => $partnerMoney,
-                "date" => Carbon::now()->toDateString(),
-            ]);
-        }
+            if ($totalBalance <= 0) {
+                throw new NoEligiblePartnersException("لا يوجد رصيد للشركاء لتوزيعه");
+            }
+                foreach ($eligibleBalances as $partnerId => $profitableBalance) {
+                    $partnerMoney = ($profitableBalance / $totalBalance)  * $remainingMoney;
+                    $zakat = $partnerMoney * 0.002;
+                    $partnerMoneyAfterZakat = $partnerMoney - $zakat;
+                    Partner::find($partnerId)->profitShares()->create([
+                        "month_profit_id" => $monthProfitId,
+                        "profit_share" => $partnerMoneyAfterZakat,
+                        "date" => $date,
+                    ]);
+                }
+                    
     }
 
     public function getPartnersEligibleBalances($month, $year): array

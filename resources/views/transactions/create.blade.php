@@ -73,7 +73,7 @@
                             <div class="form-group">
                                 <label for="exampleFormControlSelect2">اختار الشريك</label>
                                 <select class="form-control" id="partner-select" name="partner_id"
-                                    id="exampleFormControlSelect2" style="height: 50px; font-size: 14px;">
+                                     style="height: 50px; font-size: 14px;">
                                     <option disabled selected>اختار الشريك</option>
                                     @foreach ($partners as $id => $partner)
                                         <option value="{{ $id }}">{{ $partner }}</option>

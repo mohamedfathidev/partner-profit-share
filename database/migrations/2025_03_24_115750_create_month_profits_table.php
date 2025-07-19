@@ -18,7 +18,6 @@ return new class extends Migration
             $table->decimal('total_profit', 10, 2);
             $table->decimal('unused_goods', 10, 2);
             $table->decimal('distribution_profit', 10, 2)->default(0);
-            $table->enum('status', ['open', 'closed'])->default('open');
             $table->integer('version')->default(1);
             $table->unique(['version', 'month', 'year']);
             $table->timestamps();

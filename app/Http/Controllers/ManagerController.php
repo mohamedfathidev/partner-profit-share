@@ -69,7 +69,7 @@ class ManagerController extends Controller
     {
         $request->validate([
             "name" => "required",
-            "percentage" => "required|numeric",
+            "percentage" => "required|numeric|between:0,100",
         ],[
             "name.required" => 'هذا الحقل مطلوب',
             "percentage.required" => 'هذا الحقل مطلوب',
@@ -112,7 +112,7 @@ class ManagerController extends Controller
     {
         $request->validate([
             "name" => "required",
-            "percentage" => "required|numeric",
+            "percentage" => "required|numeric|between:0,100",
         ],[
             "name.required" => 'هذا الحقل مطلوب',
             "percentage.required" => 'هذا الحقل مطلوب',
@@ -134,6 +134,7 @@ class ManagerController extends Controller
      */
     public function destroy(Manager $manager)
     {
+        $manager->profitShares()->delete();
         $manager->delete();
 
         // important to return json if you faced an error for reloading the table

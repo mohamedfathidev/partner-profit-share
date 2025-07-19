@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'تقارير الأرباح')
+@section('title', ' التقرير السنوي عن الأرباح')
 
 @section('css')
     <meta charset="UTF-8">
@@ -161,7 +161,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb pt-0 pr-0 float-left float-sm-right">
-                    <li class="breadcrumb-item"><a href="#" class="default-color">الرئيسية</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="default-color">الرئيسية</a></li>
                     <li class="breadcrumb-item active" style="color: #2c3e50;">تقارير الأرباح</li>
                 </ol>
             </div>
@@ -172,50 +172,26 @@
 @section('content')
 
 
-    <form action="{{ route('show-month-general-report') }}" method="Get" class="row mb-4">
+    <form action="{{ route('report.general.annual.generate') }}" method="Post" class="row mb-4">
+        @csrf
+
         <div class="col-md-4">
-            <label class="filter-label">السنة</label>
-            <input type="number" name="year" id="year">
+            <label class="filter-label">من تاريخ</label>
+            <input type="date" class="form-control" name="from_date" required>
         </div>
+
         <div class="col-md-4">
-            <label class="filter-label">الشهر </label>
-            <select class="form-control" name="month">
-                <option value="{{ now()->month }}">-- الشهر الحالي --</option>
-                <option value="1">يناير</option>
-                <option value="2">فبراير</option>
-                <option value="3">مارس</option>
-                <option value="4">أبريل</option>
-                <option value="5">مايو</option>
-                <option value="6">يونيو</option>
-                <option value="7">يوليو</option>
-                <option value="8">أغسطس</option>
-                <option value="9">سبتمبر</option>
-                <option value="10">أكتوبر</option>
-                <option value="11">نوفمبر</option>
-                <option value="12">ديسمبر</option>
-            </select>
+            <label class="filter-label">إلى تاريخ</label>
+            <input type="date" class="form-control" name="to_date" required>
         </div>
+
         <div class="col-md-4">
             <label class="filter-label">&nbsp;</label>
-            <button type="submit" class="btn btn-primary btn-block">عرض التقرير</button>
+            <button type="submit" class="btn btn-primary btn-block">تحميل التقرير</button>
         </div>
     </form>
 
-    <div class="row pdf-report">
-        <div class="col-md-12">
-            <div class="header">
-                <h3 style="font-weight: bold">AL-MANSOUR</h3>
-                <div class="title">تقرير الأرباح الشهري -
-                    {{ \Carbon\Carbon::parse(now())->locale('ar')->translatedFormat('F Y') }} </div>
-                <div>إعداد النظام: {{ date('Y-m-d') }}</div>
-            </div>
-            
-            <div class="footer">
-                <p>التوقيع: مدير المشروع</p>
-                <p>بيانات التواصل: 0123XXXXXXX</p>
-            </div>
-        </div>
-    </div>
+
 
 @endsection
 

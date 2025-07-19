@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 
+
+use App\Services\ReportService;
+use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 use PDF;
 use Carbon\Carbon;
 use App\Models\Partner;
+use App\Models\PartnerHistory;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 
@@ -16,67 +20,64 @@ class ReportController extends Controller
         return view('reports.general-monthly-report');
     }
 
-    public function generateGeneralMonthlyReport(Request $request)
-    { 
-        // Get the same data as in showGeneralMonthlyReport
-        $startOfMonth = Carbon::createFromDate($request->get('year') ?? now()->year, $request->get('month') ?? now()->month , '1')->startOfMonth();
-        $endOfMonth = Carbon::createFromDate($request->get('year') ?? now()->year, $request->get('month') ?? now()->month, '1')->endOfMonth()->endOfDay();
+    public function generateGeneralMonthlyReport(Request $request, ReportService $reportService): void
+    {
+        $reportService->generateGeneralMonthlyReport($request->get('year'), $request->get('month'));
+    }
 
-        $partners = Partner::with(['transactions', 'profitShares'])
-            ->whereHas('transactions', function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
-            })
-            ->orWhereHas('profitShares', function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->whereBetween('date', [$startOfMonth, $endOfMonth]);
-            })
-            ->orWhere('active', 1)
-            ->get();
- 
-        // Calculate totals
-        $totalBalance = $partners->sum('balance');
-        $totalWithdrawals = $partners->sum(function ($partner) {
-            return $partner->transactions->where('type', 'withdrawal')->sum('amount');
-        });
-        $totalDeposits = $partners->sum(function ($partner) {
-            return $partner->transactions->where('type', 'deposite')->sum('amount');
-        });
-        $totalTransactions = $partners->sum(function ($partner) {
-            return $partner->transactions->count();
-        });
-        $totalProfitShares = $partners->sum(function ($partner) {
-            return $partner->profitShares->sum('profit_share');
-        });
+    public function showGeneralAnnualForm(): View
+    {
+        return view('reports.general-annual-report');
+    }
 
 
-        $pdf = PDF::loadView('pdf.general-monthly-report', compact(
-            'partners',
-            'totalBalance',
-            'totalWithdrawals',
-            'totalDeposits',
-            'totalTransactions',
-            'totalProfitShares',
-            'startOfMonth'
-        ));
+    public function generateGeneralAnnualReport(Request $request, ReportService $reportService): void
+    {
+        $reportService->generateGeneralAnnualReport($request->get('from_date'), $request->get('to_date'));
+    }
 
-        // إضافة Watermark
-        $pdf->getMpdf()->SetWatermarkText('AL-MANSOUR');
-        $pdf->getMpdf()->showWatermarkText = true;
-        $pdf->getMpdf()->watermarkTextAlpha = 0.1; // شفافية العلامة المائية
-
-        $pdf->getMpdf()->SetHTMLHeader('
-            <div style="text-align: center; font-family: Cairo; font-size: 12px; color: #666;">
-                تقرير توزيع الأرباح الشهري - AL-MANSOUR
-            </div>
-        ');
-
-        // إضافة الفوتر مع رقم الصفحة
-        $pdf->getMpdf()->SetHTMLFooter('
-            <div style="text-align: center; font-family: Cairo; font-size: 10px; color: #666;">
-                صفحة  {PAGENO} 
-            </div>
-        ');
-
-        return $pdf->stream('doc.pdf');
+    public function showPartnerMonthlyForm(): View
+    {
+        $partners = Partner::select('id', 'name')->get();
+        return view('reports.partner-monthly-report', compact('partners'));
 
     }
+
+    public function generatePartnerMonthlyReport(Request $request, ReportService $reportService): void
+    {
+        $request->validate([
+            "partner_id" => "required"
+        ],[
+            "partner_id.required" => "يجب إختيار شريك أولا"
+        ]);
+
+        $reportService->generatePartnerMonthlyReport($request->partner_id, $request->get('year'), $request->get('month'));
+    }
+
+    public function showPartnerAnnualForm(): View
+    {
+        $partners = Partner::select('id', 'name')->get();
+        return view('reports.partner-annual-report', compact('partners'));
+
+    }
+
+    public function generatePartnerAnnualReport(Request $request, ReportService $reportService): void
+    {
+        $request->validate([
+            "partner_id" => "required"
+        ],[
+            "partner_id.required" => "يجب إختيار شريك أولا"
+        ]);
+
+        $reportService->generatePartnerAnnualReport($request->partner_id, $request->get('from_date'), $request->get('to_date'));
+    }
+
+
+    public function showPartnersHistory(): View
+    {
+
+        $partnersHistory = PartnerHistory::all();
+        return view('partners-history', compact('partnersHistory'));
+    }
+
 }
